@@ -18,7 +18,7 @@ public class RedisSink implements Sink<String> {
 
     @Override
     public SinkWriter<String> createWriter(WriterInitContext context) {
-        final RedisClient redisClient = RedisClient.create("redis://192.168.49.2:30007");
+        final RedisClient redisClient = RedisClient.create("redis://localhost:6379");
         final StatefulRedisConnection<String, String> connection = redisClient.connect();
         final RedisCommands<String, String> syncCommands = connection.sync();
 
