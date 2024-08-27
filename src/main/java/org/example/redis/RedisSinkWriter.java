@@ -21,10 +21,35 @@ public class RedisSinkWriter implements SinkWriter<String> {
 
     @Override
     public void write(String element, Context context) throws IOException {
-        if (syncCommands == null) {
-            throw new IOException("Redis connection is not initialized.");
+        int attempt = 0;
+        boolean success = false;
+
+        int maxRetries = 3;
+        while (!success) {
+            try {
+                if (syncCommands == null) {
+                    throw new IOException("Redis connection is not initialized.");
+                }
+
+                if ("error".equals(element)) {
+                    throw new IOException("Simulated error for testing.");
+                }
+
+                syncCommands.rpush("flink-data", element);
+                success = true;
+            } catch (Exception e) {
+                attempt++;
+                if (attempt >= maxRetries) {
+                    throw new IOException("Failed to write data to Redis after " + maxRetries + " attempts.", e);
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("Thread interrupted during retry wait.", ie);
+                }
+            }
         }
-        syncCommands.rpush("flink-data", element);
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.example.redis.RedisSink;
 public class FlinkProcessor {
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStream<String> dataStream = env.fromData("apple", "banana", "cherry", "date", "elderberry");
+        DataStream<String> dataStream = env.fromData("apple", "banana", "error", "cherry", "date");
         dataStream.sinkTo(new RedisSink());
         env.execute("Flink Redis Sink Example");
     }
